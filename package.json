@@ -1,0 +1,12 @@
+{
+  "name": "car-marketplace",
+  "version": "1.0.0",
+  "description": "datafile",
+  "main": "index.js",
+  "scripts": {
+    "test": "testamal"
+  },
+  "keywords": ["car" ],
+  "author": "amal shweiki",
+  "license": "ISC"
+}
