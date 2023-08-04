@@ -244,8 +244,8 @@ const CarManager = {
 };
 
 const CarPurchaseManager = {
-  agencies: [],
-  customers: [],
+  agencies: agencies,
+  customers: customers,
   taxesAuthority: {
     totalTaxesPaid: 0,
     sumOfAllTransactions: 0,
@@ -257,13 +257,54 @@ const CarPurchaseManager = {
   // @param {string} customerId - The ID of the customer
   // @return {boolean} - true if the car was sold successfully, false otherwise
   sellCar: function (carId, customerId) {
-
+    //Find the agency with the car
+    let agencyWithCar ;
+    let carToSell;
+    for (const agency of agencies) {
+      const carIndex = agency.cars.findIndex((car) => car.carNumber === carId);
+      if (carIndex !== -1) {agencyWithCar = agency;} 
+                                    }
+    // If the car doesnt exiist in no agency return false
+    if (!agencyWithCar) {
+      return false;
+    }
+    //Find the customer
+    const customer = customers.find(customers => customers.id === customerId);
+    if(!customer){
+      return false;
+    }
+    const priceOfCar=agencyWithCar.cars.find((car) => car.carNumber === carId).price
+    const totalCost=priceOfCar+priceOfCar* 0.17;
+      
+      if(customer.cash >= priceOfCar)
+      {
+        carToSell = agencyWithCar.cars.find((car) => car.carNumber === carId);
+        customer.cash -=totalCost;
+        customer.cars.push(carToSell);
+        agencyWithCar.cash +=priceOfCar; 
+        this.taxesAuthority.totalTaxesPaid += totalCost * 0.17;
+        this.taxesAuthority.sumOfAllTransactions += totalCost;
+        this.taxesAuthority.numberOfTransactions++;
+        const carIndex = agencyWithCar.cars.findIndex((car) => car.carNumber === carId);
+        agencyWithCar.cars.splice(carIndex, 1);
+        carToSell.ownerId=customerId;
+                                  return true;
+        }
+        return false;
   },
 
   // Calculate and return the total revenue of the entire market.
   // @return {number} - The total revenue of the market
   getTotalMarketRevenue: function () {
+    let totalRevenue = 0;
 
+    for (const agency of this.agencies) {
+      for (const car of agency.cars) {
+        totalRevenue += car.price;
+      }
+    }
+
+    return totalRevenue;
   },
 };
 
@@ -349,6 +390,9 @@ car={
   idOrName= "2RprZ1dbL";
   console.log(CustomerManager.searchCustomer(idOrName)) */
  // console.log(CustomerManager.getAllCustomers())
- customerId="2RprZ1dbL";
- cash=6000;
- console.log(CustomerManager.changeCustomerCash (customerId, cash))
+ //customerId="2RprZ1dbL";
+// cash=6000;
+// console.log(CustomerManager.changeCustomerCash (customerId, cash))
+
+console.log(CarPurchaseManager.sellCar("S6DL1","BGzHhjnE8"))
+console.log(CarPurchaseManager.sellCar("AZJZ4","BGzHhjnE8").agencyWithCar)
